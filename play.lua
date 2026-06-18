@@ -40,6 +40,9 @@ local NOTES_5KEY_ALIGN_RL = 				optionCount()
 local NOTES_5KEY_ALIGN_CENTER = 			optionCount()
 local NOTES_5KEY_ALIGN_ENLARGE = 			optionCount()
 
+local NOTES_4KEY_ALIGN_CENTER = 			optionCount()
+local NOTES_4KEY_ALIGN_ENLARGE = 			optionCount()
+
 local NOTES_6KEY_ALIGN_CENTER = 			optionCount()
 local NOTES_6KEY_ALIGN_ENLARGE = 			optionCount()
 
@@ -421,6 +424,10 @@ local original_property = {
 		{name = "Center", 								op = NOTES_5KEY_ALIGN_CENTER},
 		{name = "Enlarge", 								op = NOTES_5KEY_ALIGN_ENLARGE}
 	}},
+	{name = "Notes 4Key Align", 						item = {
+		{name = "Center", 								op = NOTES_4KEY_ALIGN_CENTER},
+		{name = "Enlarge", 								op = NOTES_4KEY_ALIGN_ENLARGE}
+	}},
 	{name = "Notes 6Key Align", 						item = {
 		{name = "Center", 								op = NOTES_6KEY_ALIGN_CENTER},
 		{name = "Enlarge", 								op = NOTES_6KEY_ALIGN_ENLARGE}
@@ -562,14 +569,16 @@ local function processHeader(type)
 		local h = 				{}
 		local c = 				{}
 
-		if type == 0 or type == 23 then	-- 7key / 6key
+		if type == 0 or type == 22 or type == 23 then	-- 7key / 4key / 6key
 
 			-- 1 : property -> Option
 			do
 				if type == 23 then
-					exclude_names = {"Notes 5Key Align"}
-				else
+					exclude_names = {"Notes 5Key Align", "Notes 4Key Align"}
+				elseif type == 22 then
 					exclude_names = {"Notes 5Key Align", "Notes 6Key Align"}
+				else
+					exclude_names = {"Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
 				end
 				h.property, c.property = createTable(original_property, exclude_names, "Option")
 			end
@@ -682,7 +691,7 @@ local function processHeader(type)
 					"Temeplate_9key : Yellow-Keybeam",
 					"Temeplate_9key : Scratch-Keybeam"
 				}
-				if type == 23 then
+				if type == 22 or type == 23 then
 					local filtered = {}
 					for _, name in ipairs(exclude_names) do
 						if not string.find(name, "Temeplate_5key : Enlarge", 1, true) then
@@ -700,7 +709,7 @@ local function processHeader(type)
 		elseif type == 1 then	-- 5key
 
 			-- 1 : property -> Option
-			exclude_names = {"Notes 6Key Align"}
+			exclude_names = {"Notes 4Key Align", "Notes 6Key Align"}
 			h.property, c.property = createTable(original_property, exclude_names, "Option")
 
 			-- 2 : filepath -> Image
@@ -786,7 +795,7 @@ local function processHeader(type)
 
 			-- 1 : property -> Option
 			do
-				exclude_names = {"Lane Center", "Notes 5Key Align", "Notes 6Key Align"}
+				exclude_names = {"Lane Center", "Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
 				h.property, c.property = createTable(original_property, exclude_names, "Option")
 			end
 
@@ -915,6 +924,7 @@ local header = {
 		0:7keys
 		1:5keys
 		4:9keys
+		22:4keys (BMZ extension)
 		23:6keys (BMZ extension)
 	--]]
 	type = 		nil, -- set in ".luaskin"
@@ -940,6 +950,7 @@ local header = {
 
 local function is7key() return header.type == 0 end
 local function is5key() return header.type == 1 end
+local function is4key() return header.type == 22 end
 local function is9key() return header.type == 4 end
 local function is6key() return header.type == 23 end
 
@@ -959,6 +970,7 @@ local function is5keyAlignRL() 			return skin_config.option["Notes 5Key Align"] 
 local function is5keyAlignCenter() 		return skin_config.option["Notes 5Key Align"] ==			NOTES_5KEY_ALIGN_CENTER end
 local function is5keyAlignEnlarge() 	return skin_config.option["Notes 5Key Align"] ==			NOTES_5KEY_ALIGN_ENLARGE end
 
+local function is4keyAlignEnlarge() 	return skin_config.option["Notes 4Key Align"] ==			NOTES_4KEY_ALIGN_ENLARGE end
 local function is6keyAlignEnlarge() 	return skin_config.option["Notes 6Key Align"] ==			NOTES_6KEY_ALIGN_ENLARGE end
 
 local function isNotesHeight_50() 		return skin_config.option["Notes Height"] == 				NOTES_HEIGHT_50_PIX end
@@ -1062,7 +1074,7 @@ local function main()
 	end
 
 	local function setDefaultNotesWidth()
-		if (is5key() and is5keyAlignEnlarge()) or (is6key() and is6keyAlignEnlarge()) then
+		if (is5key() and is5keyAlignEnlarge()) or (is4key() and is4keyAlignEnlarge()) or (is6key() and is6keyAlignEnlarge()) then
 			notesInfo.Ot_width = 132
 			notesInfo.Sc_width = 142
 		elseif is9key() then
@@ -1487,7 +1499,7 @@ local function main()
 	local key_type
 	if isNotesWidthCustom() then
 		key_type = "/custom/"
-	elseif (is5key() and is5keyAlignEnlarge()) or (is6key() and is6keyAlignEnlarge()) then
+	elseif (is5key() and is5keyAlignEnlarge()) or (is4key() and is4keyAlignEnlarge()) or (is6key() and is6keyAlignEnlarge()) then
 		key_type = "/5keyL/"
 	elseif is9key() then
 		key_type = "/9key/"
@@ -2050,6 +2062,19 @@ local function main()
 		skin.note.hcndamage =		{"hcDm-Wh", "hcDm-Bl", "hcDm-Wh", "hcDm-Wh", "hcDm-Bl", "hcDm-Wh"}
 		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Wh", "hcRe-Bl", "hcRe-Wh"}
 		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Wh", "mine-Wh", "mine-Bl", "mine-Wh"}
+	elseif is4key() then
+		skin.note.note = 			{"note-Wh", "note-Bl", "note-Bl", "note-Wh"}
+		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Bl", "lnEn-Wh"}
+		skin.note.lnstart = 		{"lnSt-Wh", "lnSt-Bl", "lnSt-Bl", "lnSt-Wh"}
+		skin.note.lnbody = 			{"lnBo-Wh", "lnBo-Bl", "lnBo-Bl", "lnBo-Wh"}
+		skin.note.lnactive = 		{"lnAc-Wh", "lnAc-Bl", "lnAc-Bl", "lnAc-Wh"}
+		skin.note.hcnend = 			{"hcEn-Wh", "hcEn-Bl", "hcEn-Bl", "hcEn-Wh"}
+		skin.note.hcnstart = 		{"hcSt-Wh", "hcSt-Bl", "hcSt-Bl", "hcSt-Wh"}
+		skin.note.hcnbody = 		{"hcBo-Wh", "hcBo-Bl", "hcBo-Bl", "hcBo-Wh"}
+		skin.note.hcnactive = 		{"hcAc-Wh", "hcAc-Bl", "hcAc-Bl", "hcAc-Wh"}
+		skin.note.hcndamage =		{"hcDm-Wh", "hcDm-Bl", "hcDm-Bl", "hcDm-Wh"}
+		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Bl", "hcRe-Wh"}
+		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Bl", "mine-Wh"}
 	elseif is5key() then
 		skin.note.note = 			{"note-Wh", "note-Bl", "note-Ye", "note-Bl", "note-Wh", "note-Sc"}
 		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Ye", "lnEn-Bl", "lnEn-Wh", "lnEn-Sc"}
@@ -2100,6 +2125,24 @@ local function main()
 		end
 
 		for i = 1, 8 do
+			skin.note.dst[i] = {
+				x = notesInfo.notes_x[i] + GEOMETRY.PLAY_POS,
+				y = GEOMETRY.LANE_Y,
+				w = notesInfo.notes_w[i],
+				h = GEOMETRY.LANE_H}
+		end
+	elseif is4key() then
+		local notes_start = GEOMETRY.LANE_X + math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 4) / 2)
+
+		notesInfo.notes_w[1] = notesInfo.Ot_width
+		notesInfo.notes_x[1] = notes_start
+
+		for i = 2, 4 do
+			notesInfo.notes_x[i] = notesInfo.notes_x[i-1] + notesInfo.Ot_width
+			notesInfo.notes_w[i] = notesInfo.Ot_width
+		end
+
+		for i = 1, 4 do
 			skin.note.dst[i] = {
 				x = notesInfo.notes_x[i] + GEOMETRY.PLAY_POS,
 				y = GEOMETRY.LANE_Y,
@@ -2769,6 +2812,29 @@ local function main()
 				0
 			}
 		end
+	elseif is4key() then
+		kb_w = {
+			notesInfo.Ot_width,
+			notesInfo.Ot_width,
+			notesInfo.Ot_width,
+			notesInfo.Ot_width
+		}
+		kb_type = 		{"w", "b", "b", "w"}
+		kb_onTimer = 	{101, 102, 103, 104}
+		kb_offTimer =	{121, 122, 123, 124}
+		kb_move_x = {
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2
+		}
+		local notes_start = math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 4) / 2)
+		kb_x = {
+			notes_start,
+			notes_start + notesInfo.Ot_width,
+			notes_start + notesInfo.Ot_width * 2,
+			notes_start + notesInfo.Ot_width * 3
+		}
 	elseif is6key() then
 		kb_w = {
 			notesInfo.Ot_width,
@@ -3535,6 +3601,19 @@ local function main()
 				notesInfo.Sc_width / 2
 			}
 		end
+	elseif is4key() then
+		b_init = 		{"1", "2", "3", "4"}
+		bombTimer = 	{51, 52, 53, 54}
+		lnBombTimer = 	{71, 72, 73, 74}
+
+		-- center of bomb
+		local notes_start = math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 4) / 2)
+		bombPosX = {
+			notes_start + notesInfo.Ot_width / 2,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 2,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 3
+		}
 	elseif is6key() then
 		b_init = 		{"1", "2", "3", "4", "5", "6"}
 		bombTimer = 	{51, 52, 53, 54, 55, 56}
