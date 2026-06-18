@@ -2015,18 +2015,18 @@ local function main()
 		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Ye", "hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Sc"}
 		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Wh", "mine-Ye", "mine-Wh", "mine-Bl", "mine-Wh", "mine-Sc"}
 	elseif is6key() then
-		skin.note.note = 			{"note-Wh", "note-Bl", "note-Wh", "note-Ye", "note-Wh", "note-Bl"}
-		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Ye", "lnEn-Wh", "lnEn-Bl"}
-		skin.note.lnstart = 		{"lnSt-Wh", "lnSt-Bl", "lnSt-Wh", "lnSt-Ye", "lnSt-Wh", "lnSt-Bl"}
-		skin.note.lnbody = 			{"lnBo-Wh", "lnBo-Bl", "lnBo-Wh", "lnBo-Ye", "lnBo-Wh", "lnBo-Bl"}
-		skin.note.lnactive = 		{"lnAc-Wh", "lnAc-Bl", "lnAc-Wh", "lnAc-Ye", "lnAc-Wh", "lnAc-Bl"}
-		skin.note.hcnend = 			{"hcEn-Wh", "hcEn-Bl", "hcEn-Wh", "hcEn-Ye", "hcEn-Wh", "hcEn-Bl"}
-		skin.note.hcnstart = 		{"hcSt-Wh", "hcSt-Bl", "hcSt-Wh", "hcSt-Ye", "hcSt-Wh", "hcSt-Bl"}
-		skin.note.hcnbody = 		{"hcBo-Wh", "hcBo-Bl", "hcBo-Wh", "hcBo-Ye", "hcBo-Wh", "hcBo-Bl"}
-		skin.note.hcnactive = 		{"hcAc-Wh", "hcAc-Bl", "hcAc-Wh", "hcAc-Ye", "hcAc-Wh", "hcAc-Bl"}
-		skin.note.hcndamage =		{"hcDm-Wh", "hcDm-Bl", "hcDm-Wh", "hcDm-Ye", "hcDm-Wh", "hcDm-Bl"}
-		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Ye", "hcRe-Wh", "hcRe-Bl"}
-		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Wh", "mine-Ye", "mine-Wh", "mine-Bl"}
+		skin.note.note = 			{"note-Wh", "note-Bl", "note-Wh", "note-Wh", "note-Bl", "note-Wh"}
+		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Wh", "lnEn-Bl", "lnEn-Wh"}
+		skin.note.lnstart = 		{"lnSt-Wh", "lnSt-Bl", "lnSt-Wh", "lnSt-Wh", "lnSt-Bl", "lnSt-Wh"}
+		skin.note.lnbody = 			{"lnBo-Wh", "lnBo-Bl", "lnBo-Wh", "lnBo-Wh", "lnBo-Bl", "lnBo-Wh"}
+		skin.note.lnactive = 		{"lnAc-Wh", "lnAc-Bl", "lnAc-Wh", "lnAc-Wh", "lnAc-Bl", "lnAc-Wh"}
+		skin.note.hcnend = 			{"hcEn-Wh", "hcEn-Bl", "hcEn-Wh", "hcEn-Wh", "hcEn-Bl", "hcEn-Wh"}
+		skin.note.hcnstart = 		{"hcSt-Wh", "hcSt-Bl", "hcSt-Wh", "hcSt-Wh", "hcSt-Bl", "hcSt-Wh"}
+		skin.note.hcnbody = 		{"hcBo-Wh", "hcBo-Bl", "hcBo-Wh", "hcBo-Wh", "hcBo-Bl", "hcBo-Wh"}
+		skin.note.hcnactive = 		{"hcAc-Wh", "hcAc-Bl", "hcAc-Wh", "hcAc-Wh", "hcAc-Bl", "hcAc-Wh"}
+		skin.note.hcndamage =		{"hcDm-Wh", "hcDm-Bl", "hcDm-Wh", "hcDm-Wh", "hcDm-Bl", "hcDm-Wh"}
+		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Wh", "hcRe-Bl", "hcRe-Wh"}
+		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Wh", "mine-Wh", "mine-Bl", "mine-Wh"}
 	elseif is5key() then
 		skin.note.note = 			{"note-Wh", "note-Bl", "note-Ye", "note-Bl", "note-Wh", "note-Sc"}
 		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Ye", "lnEn-Bl", "lnEn-Wh", "lnEn-Sc"}
@@ -2755,7 +2755,7 @@ local function main()
 			notesInfo.Ot_width,
 			notesInfo.Ot_width
 		}
-		kb_type = 		{"w", "b", "w", "y", "w", "b"}
+		kb_type = 		{"w", "b", "w", "w", "b", "w"}
 		kb_onTimer = 	{101, 102, 103, 104, 105, 106}
 		kb_offTimer =	{121, 122, 123, 124, 125, 126}
 		kb_move_x = {
