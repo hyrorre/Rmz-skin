@@ -40,6 +40,9 @@ local NOTES_5KEY_ALIGN_RL = 				optionCount()
 local NOTES_5KEY_ALIGN_CENTER = 			optionCount()
 local NOTES_5KEY_ALIGN_ENLARGE = 			optionCount()
 
+local NOTES_6KEY_ALIGN_CENTER = 			optionCount()
+local NOTES_6KEY_ALIGN_ENLARGE = 			optionCount()
+
 local NOTES_HEIGHT_50_PIX = 				optionCount()
 local NOTES_HEIGHT_45_PIX = 				optionCount()
 local NOTES_HEIGHT_40_PIX = 				optionCount()
@@ -418,6 +421,10 @@ local original_property = {
 		{name = "Center", 								op = NOTES_5KEY_ALIGN_CENTER},
 		{name = "Enlarge", 								op = NOTES_5KEY_ALIGN_ENLARGE}
 	}},
+	{name = "Notes 6Key Align", 						item = {
+		{name = "Center", 								op = NOTES_6KEY_ALIGN_CENTER},
+		{name = "Enlarge", 								op = NOTES_6KEY_ALIGN_ENLARGE}
+	}},
 	{name = "Notes Height", 							item = {
 		{name = "50 pixel", 							op = NOTES_HEIGHT_50_PIX},
 		{name = "45 pixel", 							op = NOTES_HEIGHT_45_PIX},
@@ -559,7 +566,11 @@ local function processHeader(type)
 
 			-- 1 : property -> Option
 			do
-				exclude_names = {"Notes 5Key Align"}
+				if type == 23 then
+					exclude_names = {"Notes 5Key Align"}
+				else
+					exclude_names = {"Notes 5Key Align", "Notes 6Key Align"}
+				end
 				h.property, c.property = createTable(original_property, exclude_names, "Option")
 			end
 
@@ -671,6 +682,15 @@ local function processHeader(type)
 					"Temeplate_9key : Yellow-Keybeam",
 					"Temeplate_9key : Scratch-Keybeam"
 				}
+				if type == 23 then
+					local filtered = {}
+					for _, name in ipairs(exclude_names) do
+						if not string.find(name, "Temeplate_5key : Enlarge", 1, true) then
+							table.insert(filtered, name)
+						end
+					end
+					exclude_names = filtered
+				end
 				h.filepath, c.filepath = createTable(original_filepath, exclude_names, "Image")
 			end
 
@@ -680,6 +700,7 @@ local function processHeader(type)
 		elseif type == 1 then	-- 5key
 
 			-- 1 : property -> Option
+			exclude_names = {"Notes 6Key Align"}
 			h.property, c.property = createTable(original_property, exclude_names, "Option")
 
 			-- 2 : filepath -> Image
@@ -765,7 +786,7 @@ local function processHeader(type)
 
 			-- 1 : property -> Option
 			do
-				exclude_names = {"Lane Center", "Notes 5Key Align"}
+				exclude_names = {"Lane Center", "Notes 5Key Align", "Notes 6Key Align"}
 				h.property, c.property = createTable(original_property, exclude_names, "Option")
 			end
 
@@ -938,6 +959,8 @@ local function is5keyAlignRL() 			return skin_config.option["Notes 5Key Align"] 
 local function is5keyAlignCenter() 		return skin_config.option["Notes 5Key Align"] ==			NOTES_5KEY_ALIGN_CENTER end
 local function is5keyAlignEnlarge() 	return skin_config.option["Notes 5Key Align"] ==			NOTES_5KEY_ALIGN_ENLARGE end
 
+local function is6keyAlignEnlarge() 	return skin_config.option["Notes 6Key Align"] ==			NOTES_6KEY_ALIGN_ENLARGE end
+
 local function isNotesHeight_50() 		return skin_config.option["Notes Height"] == 				NOTES_HEIGHT_50_PIX end
 local function isNotesHeight_45() 		return skin_config.option["Notes Height"] == 				NOTES_HEIGHT_45_PIX end
 local function isNotesHeight_40() 		return skin_config.option["Notes Height"] == 				NOTES_HEIGHT_40_PIX end
@@ -1039,7 +1062,7 @@ local function main()
 	end
 
 	local function setDefaultNotesWidth()
-		if is5key() and is5keyAlignEnlarge() then
+		if (is5key() and is5keyAlignEnlarge()) or (is6key() and is6keyAlignEnlarge()) then
 			notesInfo.Ot_width = 132
 			notesInfo.Sc_width = 142
 		elseif is9key() then
@@ -1464,7 +1487,7 @@ local function main()
 	local key_type
 	if isNotesWidthCustom() then
 		key_type = "/custom/"
-	elseif is5key() and is5keyAlignEnlarge() then
+	elseif (is5key() and is5keyAlignEnlarge()) or (is6key() and is6keyAlignEnlarge()) then
 		key_type = "/5keyL/"
 	elseif is9key() then
 		key_type = "/9key/"
