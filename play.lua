@@ -555,7 +555,7 @@ local function processHeader(type)
 		local h = 				{}
 		local c = 				{}
 
-		if type == 0 then	-- 7key
+		if type == 0 or type == 23 then	-- 7key / 6key
 
 			-- 1 : property -> Option
 			do
@@ -894,6 +894,7 @@ local header = {
 		0:7keys
 		1:5keys
 		4:9keys
+		23:6keys (BMZ extension)
 	--]]
 	type = 		nil, -- set in ".luaskin"
 	name = 		"Rm-skin ver 0.2.7.c",
@@ -919,6 +920,7 @@ local header = {
 local function is7key() return header.type == 0 end
 local function is5key() return header.type == 1 end
 local function is9key() return header.type == 4 end
+local function is6key() return header.type == 23 end
 
 local function isScratchLeft() 			return skin_config.option["Scratch Side"] == 				SC_LEFT end
 local function isScratchRight() 		return skin_config.option["Scratch Side"] == 				SC_RIGHT end
@@ -2012,6 +2014,19 @@ local function main()
 		skin.note.hcndamage =		{"hcDm-Wh", "hcDm-Bl", "hcDm-Wh", "hcDm-Ye", "hcDm-Wh", "hcDm-Bl", "hcDm-Wh", "hcDm-Sc"}
 		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Ye", "hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Sc"}
 		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Wh", "mine-Ye", "mine-Wh", "mine-Bl", "mine-Wh", "mine-Sc"}
+	elseif is6key() then
+		skin.note.note = 			{"note-Wh", "note-Bl", "note-Wh", "note-Ye", "note-Wh", "note-Bl"}
+		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Ye", "lnEn-Wh", "lnEn-Bl"}
+		skin.note.lnstart = 		{"lnSt-Wh", "lnSt-Bl", "lnSt-Wh", "lnSt-Ye", "lnSt-Wh", "lnSt-Bl"}
+		skin.note.lnbody = 			{"lnBo-Wh", "lnBo-Bl", "lnBo-Wh", "lnBo-Ye", "lnBo-Wh", "lnBo-Bl"}
+		skin.note.lnactive = 		{"lnAc-Wh", "lnAc-Bl", "lnAc-Wh", "lnAc-Ye", "lnAc-Wh", "lnAc-Bl"}
+		skin.note.hcnend = 			{"hcEn-Wh", "hcEn-Bl", "hcEn-Wh", "hcEn-Ye", "hcEn-Wh", "hcEn-Bl"}
+		skin.note.hcnstart = 		{"hcSt-Wh", "hcSt-Bl", "hcSt-Wh", "hcSt-Ye", "hcSt-Wh", "hcSt-Bl"}
+		skin.note.hcnbody = 		{"hcBo-Wh", "hcBo-Bl", "hcBo-Wh", "hcBo-Ye", "hcBo-Wh", "hcBo-Bl"}
+		skin.note.hcnactive = 		{"hcAc-Wh", "hcAc-Bl", "hcAc-Wh", "hcAc-Ye", "hcAc-Wh", "hcAc-Bl"}
+		skin.note.hcndamage =		{"hcDm-Wh", "hcDm-Bl", "hcDm-Wh", "hcDm-Ye", "hcDm-Wh", "hcDm-Bl"}
+		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Wh", "hcRe-Ye", "hcRe-Wh", "hcRe-Bl"}
+		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Wh", "mine-Ye", "mine-Wh", "mine-Bl"}
 	elseif is5key() then
 		skin.note.note = 			{"note-Wh", "note-Bl", "note-Ye", "note-Bl", "note-Wh", "note-Sc"}
 		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Ye", "lnEn-Bl", "lnEn-Wh", "lnEn-Sc"}
@@ -2062,6 +2077,24 @@ local function main()
 		end
 
 		for i = 1, 8 do
+			skin.note.dst[i] = {
+				x = notesInfo.notes_x[i] + GEOMETRY.PLAY_POS,
+				y = GEOMETRY.LANE_Y,
+				w = notesInfo.notes_w[i],
+				h = GEOMETRY.LANE_H}
+		end
+	elseif is6key() then
+		local notes_start = GEOMETRY.LANE_X + math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 6) / 2)
+
+		notesInfo.notes_w[1] = notesInfo.Ot_width
+		notesInfo.notes_x[1] = notes_start
+
+		for i = 2, 6 do
+			notesInfo.notes_x[i] = notesInfo.notes_x[i-1] + notesInfo.Ot_width
+			notesInfo.notes_w[i] = notesInfo.Ot_width
+		end
+
+		for i = 1, 6 do
 			skin.note.dst[i] = {
 				x = notesInfo.notes_x[i] + GEOMETRY.PLAY_POS,
 				y = GEOMETRY.LANE_Y,
@@ -2713,6 +2746,35 @@ local function main()
 				0
 			}
 		end
+	elseif is6key() then
+		kb_w = {
+			notesInfo.Ot_width,
+			notesInfo.Ot_width,
+			notesInfo.Ot_width,
+			notesInfo.Ot_width,
+			notesInfo.Ot_width,
+			notesInfo.Ot_width
+		}
+		kb_type = 		{"w", "b", "w", "y", "w", "b"}
+		kb_onTimer = 	{101, 102, 103, 104, 105, 106}
+		kb_offTimer =	{121, 122, 123, 124, 125, 126}
+		kb_move_x = {
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2,
+			notesInfo.Ot_width / 2
+		}
+		local notes_start = math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 6) / 2)
+		kb_x = {
+			notes_start,
+			notes_start + notesInfo.Ot_width,
+			notes_start + notesInfo.Ot_width * 2,
+			notes_start + notesInfo.Ot_width * 3,
+			notes_start + notesInfo.Ot_width * 4,
+			notes_start + notesInfo.Ot_width * 5
+		}
 	elseif is5key() then
 		kb_w = {
 			notesInfo.Ot_width,
@@ -3450,6 +3512,21 @@ local function main()
 				notesInfo.Sc_width / 2
 			}
 		end
+	elseif is6key() then
+		b_init = 		{"1", "2", "3", "4", "5", "6"}
+		bombTimer = 	{51, 52, 53, 54, 55, 56}
+		lnBombTimer = 	{71, 72, 73, 74, 75, 76}
+
+		-- center of bomb
+		local notes_start = math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 6) / 2)
+		bombPosX = {
+			notes_start + notesInfo.Ot_width / 2,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 2,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 3,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 4,
+			notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 5
+		}
 	elseif is5key() then
 		b_init = 		{"1", "2", "3", "4", "5", "s"}
 		bombTimer = 	{51, 52, 53, 54, 55, 50}
