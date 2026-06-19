@@ -46,6 +46,16 @@ local NOTES_4KEY_ALIGN_ENLARGE = 			optionCount()
 local NOTES_6KEY_ALIGN_CENTER = 			optionCount()
 local NOTES_6KEY_ALIGN_ENLARGE = 			optionCount()
 
+local NOTES_8KEY_LANE_COLOR = {}
+for i = 1, 8 do
+	NOTES_8KEY_LANE_COLOR[i] = {
+		White = 	optionCount(),
+		Blue = 		optionCount(),
+		Yellow = 	optionCount(),
+		Scratch = 	optionCount()
+	}
+end
+
 local NOTES_HEIGHT_50_PIX = 				optionCount()
 local NOTES_HEIGHT_45_PIX = 				optionCount()
 local NOTES_HEIGHT_40_PIX = 				optionCount()
@@ -156,6 +166,25 @@ local GAUGE_TRANSPARENCY = 					offsetCount()
 -- ========================================================================================================================================================	
 
 -- # offset, filepath, property
+
+local NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES = {}
+for i = 1, 8 do
+	NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES[i] = "8Key Lane " .. tostring(i) .. " Color"
+end
+
+local function create8KeyLaneColorProperty(lane, def)
+	local option = NOTES_8KEY_LANE_COLOR[lane]
+	return {
+		name = NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES[lane],
+		def = def,
+		item = {
+			{name = "White", 	op = option.White},
+			{name = "Blue", 	op = option.Blue},
+			{name = "Yellow", 	op = option.Yellow},
+			{name = "Scratch", 	op = option.Scratch}
+		}
+	}
+end
 
 local original_offset = {
 	{name = "Judge Position", 					id = JUDGE_POS, 				x = true, 	y = true},
@@ -432,6 +461,14 @@ local original_property = {
 		{name = "Center", 								op = NOTES_6KEY_ALIGN_CENTER},
 		{name = "Enlarge", 								op = NOTES_6KEY_ALIGN_ENLARGE}
 	}},
+	create8KeyLaneColorProperty(1, "Yellow"),
+	create8KeyLaneColorProperty(2, "White"),
+	create8KeyLaneColorProperty(3, "Blue"),
+	create8KeyLaneColorProperty(4, "White"),
+	create8KeyLaneColorProperty(5, "White"),
+	create8KeyLaneColorProperty(6, "Blue"),
+	create8KeyLaneColorProperty(7, "White"),
+	create8KeyLaneColorProperty(8, "Yellow"),
 	{name = "Notes Height", 							item = {
 		{name = "50 pixel", 							op = NOTES_HEIGHT_50_PIX},
 		{name = "45 pixel", 							op = NOTES_HEIGHT_45_PIX},
@@ -569,16 +606,21 @@ local function processHeader(type)
 		local h = 				{}
 		local c = 				{}
 
-		if type == 0 or type == 22 or type == 23 then	-- 7key / 4key / 6key
+		if type == 0 or type == 22 or type == 23 or type == 24 then	-- 7key / 4key / 6key / 8key
 
 			-- 1 : property -> Option
 			do
-				if type == 23 then
+				if type == 24 then
+					exclude_names = {"Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
+				elseif type == 23 then
 					exclude_names = {"Notes 5Key Align", "Notes 4Key Align"}
 				elseif type == 22 then
 					exclude_names = {"Notes 5Key Align", "Notes 6Key Align"}
 				else
 					exclude_names = {"Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
+				end
+				if type ~= 24 then
+					append_all(exclude_names, NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES)
 				end
 				h.property, c.property = createTable(original_property, exclude_names, "Option")
 			end
@@ -706,10 +748,11 @@ local function processHeader(type)
 			-- 3 : offset -> Offset
 			h.offset, c.offset = createTable(original_offset, exclude_names, "Offset")
 
-		elseif type == 1 then	-- 5key
+			elseif type == 1 then	-- 5key
 
 			-- 1 : property -> Option
 			exclude_names = {"Notes 4Key Align", "Notes 6Key Align"}
+			append_all(exclude_names, NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES)
 			h.property, c.property = createTable(original_property, exclude_names, "Option")
 
 			-- 2 : filepath -> Image
@@ -796,6 +839,7 @@ local function processHeader(type)
 			-- 1 : property -> Option
 			do
 				exclude_names = {"Lane Center", "Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
+				append_all(exclude_names, NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES)
 				h.property, c.property = createTable(original_property, exclude_names, "Option")
 			end
 
@@ -953,6 +997,7 @@ local function is5key() return header.type == 1 end
 local function is4key() return header.type == 22 end
 local function is9key() return header.type == 4 end
 local function is6key() return header.type == 23 end
+local function is8key() return header.type == 24 end
 
 local function isScratchLeft() 			return skin_config.option["Scratch Side"] == 				SC_LEFT end
 local function isScratchRight() 		return skin_config.option["Scratch Side"] == 				SC_RIGHT end
@@ -972,6 +1017,33 @@ local function is5keyAlignEnlarge() 	return skin_config.option["Notes 5Key Align
 
 local function is4keyAlignEnlarge() 	return skin_config.option["Notes 4Key Align"] ==			NOTES_4KEY_ALIGN_ENLARGE end
 local function is6keyAlignEnlarge() 	return skin_config.option["Notes 6Key Align"] ==			NOTES_6KEY_ALIGN_ENLARGE end
+
+local function get8KeyLaneNoteType(lane)
+	local option = NOTES_8KEY_LANE_COLOR[lane]
+	local selected = skin_config.option[NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES[lane]]
+	if selected == option.Blue then
+		return "Bl"
+	elseif selected == option.Yellow then
+		return "Ye"
+	elseif selected == option.Scratch then
+		return "Sc"
+	else
+		return "Wh"
+	end
+end
+
+local function get8KeyLaneKeybeamType(lane)
+	local note_type = get8KeyLaneNoteType(lane)
+	if note_type == "Bl" then
+		return "b"
+	elseif note_type == "Ye" then
+		return "y"
+	elseif note_type == "Sc" then
+		return "s"
+	else
+		return "w"
+	end
+end
 
 local function isNotesHeight_50() 		return skin_config.option["Notes Height"] == 				NOTES_HEIGHT_50_PIX end
 local function isNotesHeight_45() 		return skin_config.option["Notes Height"] == 				NOTES_HEIGHT_45_PIX end
@@ -2034,13 +2106,34 @@ local function main()
 			{id = "section-line", timer = 41, offsets = {3, JUDGELINE_POS, BARLINE_TRANSPARENCY}, dst = {
 				{x = GEOMETRY.LANE_X + GEOMETRY.PLAY_POS, y = GEOMETRY.LANE_Y, w = GEOMETRY.LANE_W, h = 15, r = 255, g = 100, b = 100, a = 255, acc = 2}
 			}}
+			}
 		}
-	}
-	if is7key() then
-		skin.note.note = 			{"note-Wh", "note-Bl", "note-Wh", "note-Ye", "note-Wh", "note-Bl", "note-Wh", "note-Sc"}
-		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Ye", "lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Sc"}
-		skin.note.lnstart = 		{"lnSt-Wh", "lnSt-Bl", "lnSt-Wh", "lnSt-Ye", "lnSt-Wh", "lnSt-Bl", "lnSt-Wh", "lnSt-Sc"}
-		skin.note.lnbody = 			{"lnBo-Wh", "lnBo-Bl", "lnBo-Wh", "lnBo-Ye", "lnBo-Wh", "lnBo-Bl", "lnBo-Wh", "lnBo-Sc"}
+		local function get8KeyLaneNoteIds(prefix)
+			local ids = {}
+			for i = 1, 8 do
+				ids[i] = prefix .. "-" .. get8KeyLaneNoteType(i)
+			end
+			return ids
+		end
+
+		if is8key() then
+			skin.note.note = 			get8KeyLaneNoteIds("note")
+			skin.note.lnend = 			get8KeyLaneNoteIds("lnEn")
+			skin.note.lnstart = 		get8KeyLaneNoteIds("lnSt")
+			skin.note.lnbody = 			get8KeyLaneNoteIds("lnBo")
+			skin.note.lnactive = 		get8KeyLaneNoteIds("lnAc")
+			skin.note.hcnend = 			get8KeyLaneNoteIds("hcEn")
+			skin.note.hcnstart = 		get8KeyLaneNoteIds("hcSt")
+			skin.note.hcnbody = 		get8KeyLaneNoteIds("hcBo")
+			skin.note.hcnactive = 		get8KeyLaneNoteIds("hcAc")
+			skin.note.hcndamage =		get8KeyLaneNoteIds("hcDm")
+			skin.note.hcnreactive = 	get8KeyLaneNoteIds("hcRe")
+			skin.note.mine = 			get8KeyLaneNoteIds("mine")
+		elseif is7key() then
+			skin.note.note = 			{"note-Wh", "note-Bl", "note-Wh", "note-Ye", "note-Wh", "note-Bl", "note-Wh", "note-Sc"}
+			skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Ye", "lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Sc"}
+			skin.note.lnstart = 		{"lnSt-Wh", "lnSt-Bl", "lnSt-Wh", "lnSt-Ye", "lnSt-Wh", "lnSt-Bl", "lnSt-Wh", "lnSt-Sc"}
+			skin.note.lnbody = 			{"lnBo-Wh", "lnBo-Bl", "lnBo-Wh", "lnBo-Ye", "lnBo-Wh", "lnBo-Bl", "lnBo-Wh", "lnBo-Sc"}
 		skin.note.lnactive = 		{"lnAc-Wh", "lnAc-Bl", "lnAc-Wh", "lnAc-Ye", "lnAc-Wh", "lnAc-Bl", "lnAc-Wh", "lnAc-Sc"}
 		skin.note.hcnend = 			{"hcEn-Wh", "hcEn-Bl", "hcEn-Wh", "hcEn-Ye", "hcEn-Wh", "hcEn-Bl", "hcEn-Wh", "hcEn-Sc"}
 		skin.note.hcnstart = 		{"hcSt-Wh", "hcSt-Bl", "hcSt-Wh", "hcSt-Ye", "hcSt-Wh", "hcSt-Bl", "hcSt-Wh", "hcSt-Sc"}
@@ -2107,9 +2200,27 @@ local function main()
 	notesInfo.notes_x = {}
 	notesInfo.notes_w = {}
 
-	if is7key() then
-		notesInfo.notes_w[8] = notesInfo.Sc_width
-		notesInfo.notes_w[1] = notesInfo.Ot_width
+		if is8key() then
+			local notes_start = GEOMETRY.LANE_X + math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 8) / 2)
+
+			notesInfo.notes_w[1] = notesInfo.Ot_width
+			notesInfo.notes_x[1] = notes_start
+
+			for i = 2, 8 do
+				notesInfo.notes_x[i] = notesInfo.notes_x[i-1] + notesInfo.Ot_width
+				notesInfo.notes_w[i] = notesInfo.Ot_width
+			end
+
+			for i = 1, 8 do
+				skin.note.dst[i] = {
+					x = notesInfo.notes_x[i] + GEOMETRY.PLAY_POS,
+					y = GEOMETRY.LANE_Y,
+					w = notesInfo.notes_w[i],
+					h = GEOMETRY.LANE_H}
+			end
+		elseif is7key() then
+			notesInfo.notes_w[8] = notesInfo.Sc_width
+			notesInfo.notes_w[1] = notesInfo.Ot_width
 
 		if isScratchRight() then
 			notesInfo.notes_x[1] = GEOMETRY.LANE_X
@@ -2763,11 +2874,49 @@ local function main()
 	local kb_move_x = 	{}
 	local kb_x = 		{}
 
-	if is7key() then
-		kb_w = {
-			notesInfo.Ot_width,
-			notesInfo.Ot_width,
-			notesInfo.Ot_width,
+		if is8key() then
+			kb_w = {
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
+				notesInfo.Ot_width
+			}
+			kb_type = 		{}
+			for i = 1, 8 do
+				kb_type[i] = get8KeyLaneKeybeamType(i)
+			end
+			kb_onTimer = 	{101, 102, 103, 104, 105, 106, 107, 108}
+			kb_offTimer =	{121, 122, 123, 124, 125, 126, 127, 128}
+			kb_move_x = {
+				notesInfo.Ot_width / 2,
+				notesInfo.Ot_width / 2,
+				notesInfo.Ot_width / 2,
+				notesInfo.Ot_width / 2,
+				notesInfo.Ot_width / 2,
+				notesInfo.Ot_width / 2,
+				notesInfo.Ot_width / 2,
+				notesInfo.Ot_width / 2
+			}
+			local notes_start = math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 8) / 2)
+			kb_x = {
+				notes_start,
+				notes_start + notesInfo.Ot_width,
+				notes_start + notesInfo.Ot_width * 2,
+				notes_start + notesInfo.Ot_width * 3,
+				notes_start + notesInfo.Ot_width * 4,
+				notes_start + notesInfo.Ot_width * 5,
+				notes_start + notesInfo.Ot_width * 6,
+				notes_start + notesInfo.Ot_width * 7
+			}
+		elseif is7key() then
+			kb_w = {
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
+				notesInfo.Ot_width,
 			notesInfo.Ot_width,
 			notesInfo.Ot_width,
 			notesInfo.Ot_width,
@@ -3572,10 +3721,27 @@ local function main()
 	local bombHeight = 		bombProperty.BOMB_HEIGHT_MULUTIPLIER * 450
 	local bomb_y =			GEOMETRY.LANE_Y - math.floor((bombHeight - GEOMETRY.LANE_LINE) / 2)
 
-	if is7key() then
-		b_init = 		{"1", "2", "3", "4", "5", "6", "7", "s"}
-		bombTimer = 	{51, 52, 53, 54, 55, 56, 57, 50}
-		lnBombTimer = 	{71, 72, 73, 74, 75, 76, 77, 70}
+		if is8key() then
+			b_init = 		{"1", "2", "3", "4", "5", "6", "7", "8"}
+			bombTimer = 	{51, 52, 53, 54, 55, 56, 57, 58}
+			lnBombTimer = 	{71, 72, 73, 74, 75, 76, 77, 78}
+
+			-- center of bomb
+			local notes_start = math.floor((GEOMETRY.LANE_W - notesInfo.Ot_width * 8) / 2)
+			bombPosX = {
+				notes_start + notesInfo.Ot_width / 2,
+				notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width,
+				notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 2,
+				notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 3,
+				notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 4,
+				notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 5,
+				notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 6,
+				notes_start + notesInfo.Ot_width / 2 + notesInfo.Ot_width * 7
+			}
+		elseif is7key() then
+			b_init = 		{"1", "2", "3", "4", "5", "6", "7", "s"}
+			bombTimer = 	{51, 52, 53, 54, 55, 56, 57, 50}
+			lnBombTimer = 	{71, 72, 73, 74, 75, 76, 77, 70}
 
 		-- center of bomb
 		if isScratchRight() then
