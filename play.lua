@@ -120,6 +120,9 @@ local HI_SPEED_ABSOLUTE =					optionCount()
 local MASCOT_STOP = 						optionCount()
 local MASCOT_ACTIVE = 						optionCount()
 
+local NOTES_5KEY_COLOR_DEFAULT = 			optionCount()
+local NOTES_5KEY_COLOR_6KEY_LIKE = 			optionCount()
+
 -- ========================================================================================================================================================	
 
 -- # offset counts
@@ -555,6 +558,10 @@ local original_property = {
 	{name = "Mascot Display", 							item = {
 		{name = "Stop", 								op = MASCOT_STOP},
 		{name = "Active", 								op = MASCOT_ACTIVE}
+	}},
+	{name = "Notes 5Key Color", 						item = {
+		{name = "Default", 								op = NOTES_5KEY_COLOR_DEFAULT},
+		{name = "6Key-like", 							op = NOTES_5KEY_COLOR_6KEY_LIKE}
 	}}
 }
 
@@ -611,13 +618,13 @@ local function processHeader(type)
 			-- 1 : property -> Option
 			do
 				if type == 24 then
-					exclude_names = {"Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
+					exclude_names = {"Notes 5Key Align", "Notes 5Key Color", "Notes 4Key Align", "Notes 6Key Align"}
 				elseif type == 23 then
-					exclude_names = {"Notes 5Key Align", "Notes 4Key Align"}
+					exclude_names = {"Notes 5Key Align", "Notes 5Key Color", "Notes 4Key Align"}
 				elseif type == 22 then
-					exclude_names = {"Notes 5Key Align", "Notes 6Key Align"}
+					exclude_names = {"Notes 5Key Align", "Notes 5Key Color", "Notes 6Key Align"}
 				else
-					exclude_names = {"Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
+					exclude_names = {"Notes 5Key Align", "Notes 5Key Color", "Notes 4Key Align", "Notes 6Key Align"}
 				end
 				if type ~= 24 then
 					append_all(exclude_names, NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES)
@@ -838,7 +845,7 @@ local function processHeader(type)
 
 			-- 1 : property -> Option
 			do
-				exclude_names = {"Lane Center", "Notes 5Key Align", "Notes 4Key Align", "Notes 6Key Align"}
+				exclude_names = {"Lane Center", "Notes 5Key Align", "Notes 5Key Color", "Notes 4Key Align", "Notes 6Key Align"}
 				append_all(exclude_names, NOTES_8KEY_LANE_COLOR_PROPERTY_NAMES)
 				h.property, c.property = createTable(original_property, exclude_names, "Option")
 			end
@@ -1014,6 +1021,7 @@ local function isNotesWidthCustom() 	return skin_config.option["Notes Width"] ==
 local function is5keyAlignRL() 			return skin_config.option["Notes 5Key Align"] ==			NOTES_5KEY_ALIGN_RL end
 local function is5keyAlignCenter() 		return skin_config.option["Notes 5Key Align"] ==			NOTES_5KEY_ALIGN_CENTER end
 local function is5keyAlignEnlarge() 	return skin_config.option["Notes 5Key Align"] ==			NOTES_5KEY_ALIGN_ENLARGE end
+local function is5keyColor6KeyLike() 	return skin_config.option["Notes 5Key Color"] ==			NOTES_5KEY_COLOR_6KEY_LIKE end
 
 local function is4keyAlignEnlarge() 	return skin_config.option["Notes 4Key Align"] ==			NOTES_4KEY_ALIGN_ENLARGE end
 local function is6keyAlignEnlarge() 	return skin_config.option["Notes 6Key Align"] ==			NOTES_6KEY_ALIGN_ENLARGE end
@@ -1043,6 +1051,46 @@ local function get8KeyLaneKeybeamType(lane)
 	else
 		return "w"
 	end
+end
+
+local function noteTypeToKeybeamType(note_type)
+	if note_type == "Bl" then
+		return "b"
+	elseif note_type == "Ye" then
+		return "y"
+	elseif note_type == "Sc" then
+		return "s"
+	else
+		return "w"
+	end
+end
+
+local function get5KeyLaneNoteTypes()
+	if not is5keyColor6KeyLike() then
+		return {"Wh", "Bl", "Ye", "Bl", "Wh", "Sc"}
+	elseif isScratchLeft() then
+		return {"Bl", "Wh", "Wh", "Bl", "Wh", "Wh"}
+	else
+		return {"Wh", "Bl", "Wh", "Wh", "Bl", "Wh"}
+	end
+end
+
+local function get5KeyLaneNoteIds(prefix)
+	local note_types = get5KeyLaneNoteTypes()
+	local ids = {}
+	for i, note_type in ipairs(note_types) do
+		ids[i] = prefix .. "-" .. note_type
+	end
+	return ids
+end
+
+local function get5KeyLaneKeybeamTypes()
+	local note_types = get5KeyLaneNoteTypes()
+	local types = {}
+	for i, note_type in ipairs(note_types) do
+		types[i] = noteTypeToKeybeamType(note_type)
+	end
+	return types
 end
 
 local function isNotesHeight_50() 		return skin_config.option["Notes Height"] == 				NOTES_HEIGHT_50_PIX end
@@ -2172,18 +2220,18 @@ local function main()
 		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Bl", "hcRe-Wh"}
 		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Bl", "mine-Wh"}
 	elseif is5key() then
-		skin.note.note = 			{"note-Wh", "note-Bl", "note-Ye", "note-Bl", "note-Wh", "note-Sc"}
-		skin.note.lnend = 			{"lnEn-Wh", "lnEn-Bl", "lnEn-Ye", "lnEn-Bl", "lnEn-Wh", "lnEn-Sc"}
-		skin.note.lnstart = 		{"lnSt-Wh", "lnSt-Bl", "lnSt-Ye", "lnSt-Bl", "lnSt-Wh", "lnSt-Sc"}
-		skin.note.lnbody = 			{"lnBo-Wh", "lnBo-Bl", "lnBo-Ye", "lnBo-Bl", "lnBo-Wh", "lnBo-Sc"}
-		skin.note.lnactive = 		{"lnAc-Wh", "lnAc-Bl", "lnAc-Ye", "lnAc-Bl", "lnAc-Wh", "lnAc-Sc"}
-		skin.note.hcnend = 			{"hcEn-Wh", "hcEn-Bl", "hcEn-Ye", "hcEn-Bl", "hcEn-Wh", "hcEn-Sc"}
-		skin.note.hcnstart = 		{"hcSt-Wh", "hcSt-Bl", "hcSt-Ye", "hcSt-Bl", "hcSt-Wh", "hcSt-Sc"}
-		skin.note.hcnbody = 		{"hcBo-Wh", "hcBo-Bl", "hcBo-Ye", "hcBo-Bl", "hcBo-Wh", "hcBo-Sc"}
-		skin.note.hcnactive = 		{"hcAc-Wh", "hcAc-Bl", "hcAc-Ye", "hcAc-Bl", "hcAc-Wh", "hcAc-Sc"}
-		skin.note.hcndamage = 		{"hcDm-Wh", "hcDm-Bl", "hcDm-Ye", "hcDm-Bl", "hcDm-Wh", "hcDm-Sc"}
-		skin.note.hcnreactive = 	{"hcRe-Wh", "hcRe-Bl", "hcRe-Ye", "hcRe-Bl", "hcRe-Wh", "hcRe-Sc"}
-		skin.note.mine = 			{"mine-Wh", "mine-Bl", "mine-Ye", "mine-Bl", "mine-Wh", "mine-Sc"}
+		skin.note.note = 			get5KeyLaneNoteIds("note")
+		skin.note.lnend = 			get5KeyLaneNoteIds("lnEn")
+		skin.note.lnstart = 		get5KeyLaneNoteIds("lnSt")
+		skin.note.lnbody = 			get5KeyLaneNoteIds("lnBo")
+		skin.note.lnactive = 		get5KeyLaneNoteIds("lnAc")
+		skin.note.hcnend = 			get5KeyLaneNoteIds("hcEn")
+		skin.note.hcnstart = 		get5KeyLaneNoteIds("hcSt")
+		skin.note.hcnbody = 		get5KeyLaneNoteIds("hcBo")
+		skin.note.hcnactive = 		get5KeyLaneNoteIds("hcAc")
+		skin.note.hcndamage = 		get5KeyLaneNoteIds("hcDm")
+		skin.note.hcnreactive = 	get5KeyLaneNoteIds("hcRe")
+		skin.note.mine = 			get5KeyLaneNoteIds("mine")
 	elseif is9key() then
 		skin.note.note = 			{"note-Sc", "note-Wh", "note-Bl", "note-Wh", "note-Ye", "note-Wh", "note-Bl", "note-Wh", "note-Sc"}
 		skin.note.lnend = 			{"lnEn-Sc", "lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Ye", "lnEn-Wh", "lnEn-Bl", "lnEn-Wh", "lnEn-Sc"}
@@ -3025,7 +3073,7 @@ local function main()
 			notesInfo.Ot_width,
 			notesInfo.Sc_width
 		}
-		kb_type = 		{"w", "b", "y", "b", "w", "s"}
+		kb_type = 		get5KeyLaneKeybeamTypes()
 		kb_onTimer = 	{101, 102, 103, 104, 105, 100}
 		kb_offTimer = 	{121, 122, 123, 124, 125, 120}
 		kb_move_x = {
