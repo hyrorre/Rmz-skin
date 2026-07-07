@@ -2032,6 +2032,9 @@ local function main()
 			else
 				return tx
 			end
+		end},
+		{id = "fhs-lock", font = 0, size = 18, overflow = 1, value = function()
+			return "FHS"
 		end}
 	}
 	skin.slider = {
@@ -3287,6 +3290,10 @@ local function main()
 				{id = id_lift[i], offset = 3, op = {270}, dst = {{x = dst_x[i] + GEOMETRY.LANE_X + GEOMETRY.PLAY_POS, y = GEOMETRY.LANE_Y + 40, w = dst_w[i], h = dst_h[i]}}
 			}})
 		end
+		append_all(skin.destination, {
+			{id = "fhs-lock", offset = 4, op = {270, 1901}, dst = {{x = dst_x[2] + GEOMETRY.LANE_X + GEOMETRY.PLAY_POS + 86, y = 1049, w = 48, h = 21}}},
+			{id = "fhs-lock", offset = 3, op = {270, 1901}, dst = {{x = dst_x[2] + GEOMETRY.LANE_X + GEOMETRY.PLAY_POS + 86, y = GEOMETRY.LANE_Y + 40, w = 48, h = 21}}}
+		})
 	end
 	append_all(skin.destination, {
 		{id = -111, offset = 4, op = {270, 271}, loop = 0, dst = {
