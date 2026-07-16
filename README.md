@@ -9,7 +9,7 @@ Rm-skin is simple dark skin for beatoraja inspired by Retsukiya's "R-skin".
 - **The width and height of notes** can be changed freely.
 - **The size and color scheme of the bombs** can be freely changed.
 - **The Fast/Slow threshold** (the interval in milliseconds during which Fast/Slow is hidden) can be freely changed.
-- In addition to **7-key**, **5-key** and **9-key** are supported.
+- 4K / 5K / 6K / 7K / 8K / 9K are supported.
 
 ## About Licenses
 - Files with the prefix "!" : ["Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)"](https://creativecommons.org/licenses/by-nc-nd/4.0/deed.en "CC BY-NC-ND 4.0")
