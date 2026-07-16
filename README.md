@@ -1,5 +1,8 @@
-# Rm-skin
-##### This is simple dark skin for beatoraja inspired by Retsukiya's "R-skin".
+# Rmz-skin
+
+Rmz-skin is a skin based on gibgib1212's "Rm-skin," with added extensions for bmz-player.
+
+Rm-skin is simple dark skin for beatoraja inspired by Retsukiya's "R-skin".
 
 ## Features
 - This skin is equivalent to the **"R-skin"** standard.
