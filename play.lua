@@ -2088,10 +2088,10 @@ local function main()
 		-- BMZ extension: 344 carries the extended arrange index.  Keep the
 		-- beatoraja-compatible sprite label below for 0..9, but provide text
 		-- labels for BMZ-only F-RANDOM / MF-RANDOM without changing the atlas.
-		{id = "lane-op-fran-tx", font = 0, size = 19, overflow = 1, align = 1, value = function()
+		{id = "lane-op-fran-tx", font = 0, size = 30, overflow = 1, align = 1, value = function()
 			return "F-RANDOM"
 		end},
-		{id = "lane-op-mfran-tx", font = 0, size = 19, overflow = 1, align = 1, value = function()
+		{id = "lane-op-mfran-tx", font = 0, size = 30, overflow = 1, align = 1, value = function()
 			return "MF-RANDOM"
 		end}
 	}
@@ -2686,11 +2686,13 @@ local function main()
 	table.insert(skin.destination, {id = "gauge-op-tx", dst = {{x = GEOMETRY.INFO_POS + 244, y = 184, w = 128, h = 19}}})
 
 	-- random type
+	local lane_op_x = GEOMETRY.INFO_POS + 407
+	local lane_op_w = 146
 	do
 		local id = {"la-orig-tx", "la-mir-tx", "laran-tx", "la-rran-tx", "la-sran-tx", "la-spir-tx", "la-hran-tx", "la-alls-tx", "la-exran-tx", "la-exs-tx"}
 		for i in ipairs(id) do
 			table.insert(skin.image,
-				{id = id[i], src = "info_system_src", x = 967, y = 19 * (i - 1), w = 146, h = 19}
+				{id = id[i], src = "info_system_src", x = 967, y = 19 * (i - 1), w = lane_op_w, h = 19}
 			)
 			table.insert(skin.imageset,
 				{id = "lane-op-tx", ref = 42, images = { id[1], id[2], id[3], id[4], id[5], id[6], id[7], id[8], id[9], id[10] }
@@ -2702,21 +2704,21 @@ local function main()
 		draw = function()
 			return main_state.event_index(344) < 10
 		end,
-		dst = {{x = GEOMETRY.INFO_POS + 407, y = 184, w = 146, h = 19}}
+		dst = {{x = lane_op_x, y = 184, w = lane_op_w, h = 19}}
 	})
 	table.insert(skin.destination, {
 		id = "lane-op-fran-tx",
 		draw = function()
 			return main_state.event_index(344) == 10
 		end,
-		dst = {{x = GEOMETRY.INFO_POS + 407, y = 184, w = 146, h = 19}}
+		dst = {{x = lane_op_x + lane_op_w / 2, y = 184, w = lane_op_w, h = 19}}
 	})
 	table.insert(skin.destination, {
 		id = "lane-op-mfran-tx",
 		draw = function()
 			return main_state.event_index(344) == 11
 		end,
-		dst = {{x = GEOMETRY.INFO_POS + 407, y = 184, w = 146, h = 19}}
+		dst = {{x = lane_op_x + lane_op_w / 2, y = 184, w = lane_op_w, h = 19}}
 	})
 
 	-- Hi-Speed type
