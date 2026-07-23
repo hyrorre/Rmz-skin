@@ -2083,6 +2083,16 @@ local function main()
 		end},
 		{id = "fhs-lock", font = 0, size = 18, overflow = 1, value = function()
 			return "FHS"
+		end},
+
+		-- BMZ extension: 344 carries the extended arrange index.  Keep the
+		-- beatoraja-compatible sprite label below for 0..9, but provide text
+		-- labels for BMZ-only F-RANDOM / MF-RANDOM without changing the atlas.
+		{id = "lane-op-fran-tx", font = 0, size = 19, overflow = 1, align = 1, value = function()
+			return "F-RANDOM"
+		end},
+		{id = "lane-op-mfran-tx", font = 0, size = 19, overflow = 1, align = 1, value = function()
+			return "MF-RANDOM"
 		end}
 	}
 	skin.slider = {
@@ -2687,7 +2697,27 @@ local function main()
 			})
 		end
 	end
-	table.insert(skin.destination, {id = "lane-op-tx", dst = {{x = GEOMETRY.INFO_POS + 407, y = 184, w = 146, h = 19}}})
+	table.insert(skin.destination, {
+		id = "lane-op-tx",
+		draw = function()
+			return main_state.event_index(344) < 10
+		end,
+		dst = {{x = GEOMETRY.INFO_POS + 407, y = 184, w = 146, h = 19}}
+	})
+	table.insert(skin.destination, {
+		id = "lane-op-fran-tx",
+		draw = function()
+			return main_state.event_index(344) == 10
+		end,
+		dst = {{x = GEOMETRY.INFO_POS + 407, y = 184, w = 146, h = 19}}
+	})
+	table.insert(skin.destination, {
+		id = "lane-op-mfran-tx",
+		draw = function()
+			return main_state.event_index(344) == 11
+		end,
+		dst = {{x = GEOMETRY.INFO_POS + 407, y = 184, w = 146, h = 19}}
+	})
 
 	-- Hi-Speed type
 	if isHiSpeedRelative() then
